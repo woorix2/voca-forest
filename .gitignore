@@ -1,31 +1,23 @@
-# =========================
 # Java 빌드 파일
-# =========================
 *.class
 *.jar
 *.war
 *.ear
 
-# =========================
 # Gradle 관련
-# =========================
 .gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar   # gradle-wrapper.jar은 버전관리를 위해 예외
 !**/src/main/**/build/                # src/main 하위 build는 제외
 !**/src/test/**/build/                # src/test 하위 build도 제외
 
-# =========================
 # Spring Boot 설정파일
-# =========================
 application.properties
 application.yml
 application-*.properties
 application-*.yml
 
-# =========================
 # STS(Spring Tool Suite) 관련
-# =========================
 .apt_generated/
 .classpath
 .factorypath
@@ -37,9 +29,7 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
-# =========================
 # IntelliJ IDEA 관련
-# =========================
 .idea/
 *.iml
 *.iws
@@ -48,38 +38,26 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
-# =========================
 # NetBeans 관련
-# =========================
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 
-# =========================
 # VS Code 관련
-# =========================
 .vscode/
 
-# =========================
 # OS에서 자동 생성되는 파일
-# =========================
 .DS_Store     # macOS
 Thumbs.db     # Windows
 
-# =========================
 # 로그 파일
-# =========================
 *.log
 
-# =========================
 # 임시 파일
-# =========================
 *.swp
 *.swo
 
-# =========================
 # Node.js
-# =========================
 node_modules/

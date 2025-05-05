@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>어휘의 숲 로그인</title>
+  <link rel="stylesheet" href="/css/login.css" />
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-title" th:onclick="|location.href='@{/main}'|" >어휘의 숲</div>
+    <div class="login-subtitle">로그인</div>
+
+    <form class="login-form" method="post" action="/login">
+      <input type="email" name="email" placeholder="이메일을 입력하세요." required>
+      <input type="password" name="password" placeholder="비밀번호를 입력하세요." required>
+
+      <div class="remember">
+        <input type="checkbox" name="rememberId" id="rememberId">
+        <label for="rememberId">이메일 저장하기</label>
+      </div>
+
+      <button type="submit" class="login-btn">로그인</button>
+      <button type="button" class="join-btn">회원가입</button>
+    </form>
+
+    <div class="login-footer">
+      <button type="button" class="find-btn" th:onclick="|location.href='@{/find-email}'|">아이디 찾기</button>
+      <button type="button" class="find-btn" th:onclick="|location.href='@{/find-password}'|">비밀번호 찾기</button>
+    </div>
+
+  </div>
+
+  <!--<div th:if="${message}">
+    <script th:inline="javascript">
+        alert([[${message}]]);
+    </script>
+  </div>-->
+
+  <script th:inline="javascript">
+      const urlParams = new URL(location.href).searchParams;
+      const error = urlParams.get('error');
+      if (error) {
+          alert('이메일 또는 비밀번호가 올바르지 않습니다.');
+      }
+  </script>
+
+  <script src="/js/login.js"></script>
+</body>
+</html>

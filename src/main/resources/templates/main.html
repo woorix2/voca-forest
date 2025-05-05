@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>어서와요, 어휘의 숲</title>
+    <!--    <link rel="stylesheet" th:href="@{/css/main.css}" />-->
+    <link rel="stylesheet" href="/css/main.css" />
+    <script th:inline="javascript">
+      const wordData = [[${wordList}]];
+      const isLoggedIn = [[${isLoggedIn}]];
+      const userRole = [[${userRole}]];
+      const userWordbook = [[${wordbookList}]];
+      console.log(userWordbook);
+    </script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <!-- 로그인 안 한 사용자만 보여주기 -->
+      <div class="top-right">
+        <button class="login-btn" sec:authorize="isAnonymous()" onclick="location.href='/login'">
+          <img src="/img/icon/login.png" alt="로그인 아이콘" />로그인
+        </button>
+
+        <!-- 로그인한 사용자만 보여주기 -->
+        <button class="logout-btn" sec:authorize="isAuthenticated()" onclick="location.href='/wordbook/list'">
+          <img src="/img/icon/white-heart.png" alt="나만의 단어장 아이콘" />
+        </button>
+
+        <button class="logout-btn" sec:authorize="isAuthenticated()" onclick="openMypageModal()">
+          <img src="/img/icon/logged-in.png" alt="마이페이지 아이콘" />
+        </button>
+      </div>
+
+      <!-- 고정 배경 단어들 -->
+      <div class="floating-words">
+      </div>
+
+      <!-- 중앙 콘텐츠 -->
+      <div class="main-content">
+        <h1 class="main-title">어휘의 숲</h1>
+        <div class="search-box">
+          <button class="search-btn">
+            <img src="/img/icon/search.png" alt="검색 아이콘" />
+          </button>
+          <input type="text" id="wordInput" placeholder="유사어를 찾을 단어를 입력하세요." />
+        </div>
+        <div id="result"></div>
+      </div>
+
+      <!-- 하단 우측 버튼 -->
+      <div class="side-menu">
+        <button onclick="openTodayWordModal()">
+          <img src="/img/icon/todayword.png" alt="오늘의 단어 아이콘" /> 오늘의
+          단어
+        </button>
+        <button onclick="openRandomWordModal()">
+          <img src="/img/icon/randomword.png" alt="아무 단어 뽑기 아이콘" />
+          아무 단어 뽑기
+        </button>
+        <button onclick="openIntroModal()">
+          <img src="/img/icon/intro.png" alt="어휘의 숲 소개 아이콘" /> 어휘의
+          숲 소개
+        </button>
+      </div>
+
+      <!-- 단어 상세 (모달) -->
+      <div class="word-modal" id="wordModal">
+        <button class="close-btn" onclick="closeModal()">
+            <img class="close-img" src="/img/icon/modal-close.png" alt="닫기 이미지" />
+        </button>
+        <div class="word-modal-content">
+          <!-- 본 단어-->
+          <div class="word-info">
+            <h2 class="word-title"></h2>
+            <img src="/img/icon/empty-heart.png" alt="빈 하트 이미지" class="heart-icon" />
+            <p class="word-type"></p>
+            <div class="word-example">
+              <span class="example-tag">예시 문장</span>
+              <p></p>
+            </div>
+          </div>
+          <h2 class="inner-title">유의어</h2>
+        </div>
+      </div>
+
+      <!-- 오늘의 단어 (모달) -->
+      <div class="word-modal" id="todayWordModal">
+        <button class="close-btn" onclick="closeTodayWordModal()">
+            <img class="close-img" src="/img/icon/modal-close.png" alt="닫기 이미지" />
+        </button>
+        <div class="word-modal-content">
+          <div class="todayword-info">
+            <div class="tag">오늘의 단어</div>
+            <h2 class="todayword-title"></h2>
+            <img src="/img/icon/empty-heart.png" alt="빈 하트 이미지" class="heart-icon"/>
+            <p class="word-type"></p>
+            <div class="todayword-example">
+              <span class="example-tag">예시 문장</span>
+              <p></p>
+            </div>
+          </div>
+          <div class="comment">
+            <div class="second-tag">숲지기의 한마디</div>
+          </div>
+          <button class="view-history" th:onclick="|location.href='@{/todayword/history}'|">이전 단어들 조회</button>
+        </div>
+      </div>
+
+      <!-- 어휘의 숲 소개 (모달) -->
+      <div class="intro-modal" id="introModal">
+        <button class="close-btn" onclick="closeIntroModal()">
+          <img class="close-img" src="/img/icon/modal-close.png" alt="닫기 이미지" />
+        </button>
+        <div class="inner-modal">
+          <div class="modal-header">
+            <h2>어휘의 숲 소개</h2>
+          </div>
+          <div class="modal-body">
+            <p>
+              ‘어휘를 풍부하게 구사할 수 있어야 어휘력이 길러지고, 어휘력이
+              탄탄해야 문해력도 함께 성장합니다. 결국, 어휘력은 문해력의
+              밑바탕이 되는 중요한 능력입니다.
+            </p>
+            <br />
+            <p>
+              최근 문해력의 중요성이 점점 더 강조되고 있으며, 어휘력이
+              부족할수록 말하고자 하는 의사소통이 어려워지고 있습니다. 그래서
+              누구나 쉽고 재미있게 어휘와 친해질 수 있도록 ‘어휘의 숲’을
+              만들었습니다.
+            </p>
+            <br />
+            <p>‘어휘의 숲’에서는 다음과 같은 기능을 제공합니다.</p>
+          </div>
+          <div class="features">
+            <div class="feature-box">
+              <div class="feature-top">
+                <div class="icon-circle">
+                  <img class="feature-img" src="/img/icon/intro-lookword.png" alt="단어 찾기 이미지" />
+                </div>
+              </div>
+              <div class="text">
+                <h3>단어 찾기</h3>
+                <p>단어의 뜻과 다양한 유사어로 어휘력을 확장하세요.</p>
+              </div>
+            </div>
+            <div class="feature-box">
+              <div class="feature-top">
+                <div class="icon-circle">
+                  <img class="feature-img" src="/img/icon/intro-todayword.png" alt="오늘의 단어 이미지" />
+                </div>
+              </div>
+              <div class="text">
+                <h3>오늘의 단어</h3>
+                <p>매일 새로운 단어를 만나보세요.</p>
+              </div>
+            </div>
+            <div class="feature-box">
+              <div class="feature-top">
+                <div class="icon-circle">
+                  <img class="feature-img" src="/img/icon/intro-random.png" alt="랜덤 단어 추천 이미지" />
+                </div>
+              </div>
+              <div class="text">
+                <h3>랜덤 단어 추천</h3>
+                <p>뜻밖의 단어를 통해 어휘력을 넓혀보세요.</p>
+              </div>
+            </div>
+            <div class="feature-box">
+              <div class="feature-top">
+                <div class="icon-circle">
+                  <img class="feature-img" src="/img/icon/intro-heart.png" alt="나만의 단어장 이미지" />
+                </div>
+              </div>
+              <div class="text">
+                <h3>나만의 단어장</h3>
+                <p>마음에 드는 단어를 담고 정리해보세요.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-bottom">
+            ‘어휘의 숲’에서 어휘의 세계를 탐험해 보세요! 🌳
+          </div>
+        </div>
+        <!-- innerModal end -->
+      </div>
+      <!-- introModal end -->
+
+      <!-- 마이페이지 모달 -->
+      <div class="mypage-modal" id="mypageModal">
+        <button class="close-btn" onclick="closeMypageModal()">
+            <img class="close-img" src="/img/icon/modal-close.png" alt="닫기 이미지" />
+        </button>
+        <div class="mypage-content">
+          <!-- 사용자 정보 -->
+          <div class="user-info">
+            <h3 class="user-email">어서오세요~! [[${userName}]]님!</h3>
+              <form th:action="@{/logout}" method="post" style="display: inline;">
+                  <button type="submit" class="logout-button">로그아웃</button>
+              </form>
+          </div>
+          <!--관리자 전용 오늘의단어 추가-->
+<!--          <div class="today-word-add" id="todayWordAdd" style="display:none;">-->
+<!--            <button class="add-btn" th:onclick="|location.href='@{/upload-todayword}'|">오늘의 단어 추가</button>-->
+<!--          </div>-->
+
+          <div class="today-word-add" id="todayWordAdd" sec:authorize="hasRole('ROLE_ADMIN')">
+            <button class="add-btn" th:onclick="|location.href='@{/upload-todayword}'|">오늘의 단어 추가</button>
+          </div>
+
+            <!-- 내가 찾은 단어 -->
+            <div class="section" id="recent-search-section">
+            <h4>내가 찾은 단어</h4>
+            <ul class="word-list">
+            </ul>
+          </div>
+
+          <!-- 나만의 단어장 -->
+          <div class="section">
+            <div class="wordbook-serction">
+              <h4 th:onclick="|location.href='@{/wordbook/list}'|">나만의 단어장</h4>
+              <img src="/img/icon/forward.png" alt="나만의 단어장 목록 이동 아이콘" class="forward-icon" th:onclick="|location.href='@{/wordbook/list}'|" />
+            </div>
+            <ul class="word-list" id="my-wordbook-list">
+              <li th:each="word, iterStat : ${wordbookList}" th:if="${iterStat.index} < 5">
+                <span th:text="${word}"></span>
+              </li>
+              <li th:if="${#lists.isEmpty(wordbookList)}">
+                저장된 단어가 없습니다.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- mypageModal end -->
+
+        <!-- 아무단어 뽑기 모달 -->
+        <div class="word-modal" id="randomWordModal">
+            <button class="close-btn" onclick="closeRandomWordModal()">
+                <img class="close-img" src="/img/icon/modal-close.png" alt="닫기 이미지" />
+            </button>
+            <div class="word-modal-content">
+                <!-- 본 단어-->
+                <div class="word-info" >
+                    <h2 class="word-title" ></h2>
+                    <img src="/img/icon/empty-heart.png" alt="빈 하트 이미지" class="heart-icon" />
+                    <p class="word-type" ></p>
+                    <div class="word-example" >
+                        <span class="example-tag">예시 문장</span>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- wrapper end -->
+
+    <div id="toast" class="toast-message"></div>
+
+    <script src="/js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,108 @@
+/* 기본 설정 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Pretendard", sans-serif;
+}
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: "Noto Sans KR", sans-serif;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.today-word-section {
+  max-width: 700px;
+  margin: 50px auto;
+  padding: 20px;
+}
+
+.today-word-section h2 {
+  font-size: 28px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+form {
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 15px;
+}
+
+.form-group .selectbox select {
+  width: 163.5px;
+}
+
+.form-group textarea {
+  resize: vertical; /* 세로로만 크기 조절 가능 */
+  min-height: 100px;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.form-buttons button {
+  padding: 10px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.form-buttons button:first-child {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.form-buttons .submit-btn {
+  background-color: #20c997;
+  color: #fff;
+}
+
+.form-buttons button:hover {
+  opacity: 0.85;
+}
+
+.latest-date-info {
+    margin-top:10px;
+    color:gray;
+}

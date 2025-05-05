@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>어휘의 숲 회원가입</title>
+    <link rel="stylesheet" href="/css/signup.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="signup-container">
+        <form th:action="@{/signup}" method="post">
+          <h1>회원가입</h1>
+          <div class="form-group">
+            <label>아이디(이메일)</label>
+            <div class="email-row">
+              <input type="text" id="emailLocal" placeholder="이메일을 입력하세요." />
+              <span>@</span>
+              <input type="text" id="emailDomain" placeholder="도메인 입력 또는 선택" />
+              <button type="button" class="btn-verify" id="btnSendCode">인증하기</button>
+              <!-- 숨겨진 email input 추가 -->
+              <input type="hidden" name="email" id="fullEmail" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>인증번호</label>
+            <div class="email-row">
+              <input type="text" id="verifyCode" placeholder="이메일 인증번호를 입력하세요." />
+              <button type="button" class="btn-verify-code" id="btnCheckCode">인증번호 확인</button>
+              <p id="verifyResult" style="color:green; display:none;">✅ 인증되었습니다.</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>비밀번호</label>
+            <input type="password" name="password" placeholder="비밀번호를 입력하세요." />
+          </div>
+
+          <div class="form-group">
+            <label>비밀번호 확인</label>
+            <input type="password" placeholder="비밀번호를 확인해주세요." />
+          </div>
+
+          <div class="form-group">
+            <label>이름</label>
+            <input type="text" name="name" placeholder="이름을 입력하세요." />
+          </div>
+
+          <div class="form-group">
+            <label>생년월일</label>
+            <div class="birth-row">
+              <select name="birthYear">
+                <option>년도</option>
+              </select>
+              <select name="birthMonth">
+                <option>월</option>
+              </select>
+              <select name="birthDay">
+                <option>일</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="submit-btn">가입하기</button>
+        </form>
+      </div>
+    </div>
+
+
+    <div th:if="${error}">
+      <script th:inline="javascript">
+      alert([[${error}]]);
+    </script>
+    </div>
+
+    <script src="/js/signup.js"></script>
+  </body>
+</html>

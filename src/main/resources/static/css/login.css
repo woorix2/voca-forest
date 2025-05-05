@@ -1,0 +1,85 @@
+ body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #fafafa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-title {
+      font-size: 32px;
+      font-weight: bold;
+      color: #2BA471;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+
+    .login-subtitle {
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .login-form input[type="email"],
+    .login-form input[type="password"] {
+      padding: 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .remember {
+      text-align: left;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .login-btn {
+      background-color: #2BA471;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .join-btn {
+      background-color: #f5f5f5;
+      color: #333;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .login-footer {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #888;
+    }
+
+    .find-btn {
+        background-color: #FFF;
+        color: #333;
+        border: none;
+        padding: 12px;
+        font-size: 13px;
+        border-radius: 4px;
+        cursor: pointer;
+    }

@@ -1,0 +1,575 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Pretendard", sans-serif;
+}
+
+body,
+html {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.wrapper {
+  width: 1920px;
+  height: 1080px;
+  margin: 0 auto;
+  background: linear-gradient(to bottom, #2dd3a3, #22b68e);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 로그인 버튼 */
+.top-right {
+  display: flex;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 115px;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  background-color: #000;
+  color: white;
+  border-radius: 30px;
+  padding: 8px 16px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100px;
+}
+.login-btn img {
+  width: 24px;
+  height: 24px;
+  margin-right: 3px;
+}
+
+.logout-btn {
+  background-color: #2dd3a3;
+  width: 115px;
+  padding: 8px 0px;
+  border: none;
+  cursor: pointer;
+}
+
+.logout-btn img {
+  width: 33px;
+  height: 33px;
+  margin-right: 7px;
+}
+
+/* 랜덤 단어 */
+.floating-words {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* 부모는 클릭 막음 */
+  z-index: 1;
+}
+
+.floating-words span {
+  pointer-events: auto; /* 자식만 클릭 허용! */
+  position: absolute;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  cursor: pointer; /* 마우스 커서 바뀌게 하면 UX도 좋아짐 */
+  animation: float 10s infinite ease-in-out;
+  font-size: 20px;
+  font-weight: 300;
+}
+
+/* 단어 떠다니는 효과 */
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-30px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* 중앙 메인 콘텐츠 */
+.main-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+}
+
+.main-title {
+  font-size: 48px;
+  margin-bottom: 30px;
+  font-weight: 350;
+}
+
+/* 검색창 */
+.search-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 999px;
+  padding: 10px 20px;
+  width: 300px;
+  margin: 0 auto;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+}
+
+.search-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  margin-right: 7px;
+}
+
+/* 오른쪽 하단 메뉴 */
+.side-menu {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.side-menu button {
+  background: black;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* 이미지랑 텍스트 사이 간격 */
+  color: white;
+  border-radius: 999px;
+  border: none;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.side-menu button img {
+  width: 24px;
+  height: 24px;
+}
+
+/* 모달창 */
+/* 모달창 - wrapper 안에 나타나도록 */
+.word-modal,
+.intro-modal,
+ .mypage-modal {
+  position: absolute; /* fixed → absolute */
+  top: 0;
+  right: -100%;
+  width: 686px;
+  height: 100%;
+  background: white;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  transition: right 0.4s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  border-radius: 20px 0 0 20px;
+  overflow: hidden;
+}
+
+/* 모달이 보일 때 */
+.word-modal.show,
+.intro-modal.show,
+ .mypage-modal.show {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.4) 5%,
+    rgba(255, 255, 255, 0.6) 15%,
+    rgba(255, 255, 255, 1) 40%
+  );
+  right: 0;
+}
+
+/* 모달이 보일 때 오른쪽 요소들을 왼쪽으로 밀기 위한 클래스 */
+.wrapper.modal-open .top-right,
+.wrapper.modal-open .side-menu {
+  transform: translateX(-686px); /* 모달 넓이만큼 왼쪽으로 이동 */
+  transition: transform 0.4s ease;
+}
+
+.close-btn {
+  align-self: flex-end;
+  margin: 16px;
+  font-size: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.word-modal-content {
+  width: 610px;
+  height: 804px;
+  padding: 0 24px;
+  overflow-y: auto;
+  /* flex: 1; */
+  /*background-color: #e1f6f2;*/
+  margin: 0 auto;
+  margin-bottom: 20px;
+  border-radius: 12px;
+}
+
+.word-img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 16px 0px;
+}
+
+.inner-title {
+    margin-top: 30px;
+    font-size: 30px;
+    font-weight: 400;
+}
+
+.word-info,
+.todayword-info,
+.search-word-info{
+  text-align: left;
+  background-color: #FFF;
+  border: 3px #EEEEEE solid;
+  border-radius: 12px;
+  height: 265px;
+  padding: 20px 30px 20px 20px;
+}
+.search-word-info{
+    margin: 10px 0;
+}
+.todayword-info {
+    height: 290px;
+}
+
+.tag,
+.second-tag{
+  font-size: 14px;
+  color: #fff;
+  background: #41ae91;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: block;
+  margin-bottom: 12px;
+  width: 89px;
+}
+
+.second-tag {
+    background-color: #838383;
+    width: 109px;
+}
+
+.word-title,
+.todayword-title,
+.search-word-title{
+  font-size: 30px;
+  font-weight: 400;
+  margin-bottom: 12px;
+  display: inline;
+}
+
+.word-title .heart,
+.todayword-title .heart,
+.search-word-title .heart{
+  font-size: 20px;
+  color: #e35d6a;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+.word-type,
+.search-word-type {
+  font-size: 16px;
+  color: #666;
+  margin: 15px 0;
+  word-break: keep-all;
+  overflow-y: scroll;
+  height: 80px;
+}
+
+.word-example .example-tag,
+.todayword-example .example-tag,
+.search-word-example .example-tag{
+  font-size: 14px;
+  color: #fff;
+  background: #838383;
+  padding: 4px 8px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.comment {
+    background-color: #f5f5f5;
+    border-radius: 12px;
+    height: 100px;
+    padding: 19px;
+    margin-top: 1px;
+}
+
+.view-history {
+  padding: 16px;
+  font-size: 20px;
+  font-weight: 300;
+  background: black;
+  color: white;
+  border: none;
+  width: 560px;
+  height: 55px;
+  cursor: pointer;
+  margin: 15px auto;
+  border-radius: 12px;
+}
+
+.inner-modal {
+  width: 530px;
+  height: 810px;
+  margin: 0 auto;
+}
+
+.modal-header {
+  width: 477px;
+  height: 38px;
+  margin-bottom: 75px;
+  font-size: 21px;
+}
+
+.modal-body {
+  margin-bottom: 22px;
+}
+.modal-body p {
+  word-break: keep-all;
+}
+
+.features {
+  width: 498px;
+  height: 392px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-between;
+  justify-content: space-around;
+}
+
+.feature-box {
+  width: 243px;
+  height: 190px;
+  background-color: #25d9a9;
+  border-radius: 12px;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.feature-top {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 24px;
+}
+
+.icon-circle {
+  width: 56px;
+  height: 56px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-img {
+  width: 56x;
+  height: 56x;
+}
+
+.text h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: black;
+  font-weight: 500;
+}
+
+.text p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  word-break: keep-all;
+  color: black;
+}
+
+.modal-bottom {
+  margin-top: 30px;
+}
+
+.toast-message {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 30px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease-in-out;
+  z-index: 9999;
+}
+
+.toast-message.show {
+  opacity: 1;
+}
+
+/* 마이페이지 모달*/
+
+  .mypage-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    overflow-y: auto;
+  }
+
+  .user-info {
+    text-align: center;
+  }
+
+  .user-info .profile-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+  }
+
+  .user-info .user-email {
+    margin: 0.5rem 0;
+  }
+
+  .logout-button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .add-btn {
+    width: 475px;
+    height: 72px;
+    background-color: #25d9a9;
+    border-radius: 12px;
+    font-size: 15px;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .section {
+    width: 475px;
+    height: 326px;
+    background-color: #fff;
+    border: 3px solid #eee;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .section h4 {
+    font-size: 22px;
+    margin-bottom: 22px;
+    padding-left: 10px;
+  }
+
+  .wordbook-serction {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .wordbook-serction .forward-icon {
+    width: 10px;
+    height: 15px;
+    margin: 0px 15px 20px 0px;
+    cursor: pointer;
+  }
+
+  .word-list {
+    list-style: none;
+    padding: 0;
+    height: 195px;
+  }
+
+  .word-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #eee;
+    padding: 7px 10px;
+    height: 39px;
+  }
+
+  .word-list li .close-img {
+      width: 24px;
+      height: 24px;
+    }
+
+  .word-list li span {
+    display: flex;
+    align-items: flex-end;
+  }
+  .word-list li span .heart-icon {
+      width: 24px;
+      height: 20px;
+      margin-left: 4px;
+  }
+
+  .word-list li .remove-search {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+   }
+
+  .mini-heart {
+    width: 16px;
+    height: 16px;
+    margin: 0 0.5rem;
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .pagination {
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+
+  .today-word-add {
+    cursor: pointer;
+  }

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>어휘의 숲 오늘의 단어 등록하기</title>
+    <link rel="stylesheet" href="/css/upload-todayword.css" />
+</head>
+<script th:inline="javascript">
+  const errorMessage = [[${errorMessage}]];
+  if (errorMessage) {
+    alert(errorMessage);
+  }
+</script>
+<body>
+    <div class="wrapper">
+        <section class="today-word-section">
+            <h2>오늘의 단어 등록</h2>
+            <form action="/today/register" method="POST">
+                <!-- 업로드 날짜 -->
+                <div class="form-group">
+                    <label for="year">날짜</label>
+                    <div class="selectbox">
+                        <select id="year" name="year"></select>
+                        <select id="month" name="month">
+                            <option value="">월</option>
+                            <option value="1">1월</option>
+                            <option value="2">2월</option>
+                            <option value="3">3월</option>
+                            <option value="4">4월</option>
+                            <option value="5">5월</option>
+                            <option value="6">6월</option>
+                            <option value="7">7월</option>
+                            <option value="8">8월</option>
+                            <option value="9">9월</option>
+                            <option value="10">10월</option>
+                            <option value="11">11월</option>
+                            <option value="12">12월</option>
+                        </select>
+                        <select id="day" name="day">
+                            <option value="">일</option>
+                            <!-- 1일부터 31일까지 자바스크립트로 채우자 -->
+                        </select>
+                    </div>
+                    <div th:if="${latestDate != null}" class="latest-date-info">
+                        현재 등록된 최근 날짜는 <span th:text="${latestDate}"></span> 입니다.
+                    </div>
+                </div>
+
+                <!-- 단어명 -->
+                <div class="form-group">
+                    <label for="word">단어명</label>
+                    <input type="text" id="word" name="word" placeholder="오늘의 단어를 입력하세요." required />
+                </div>
+
+                <!-- 품사 -->
+                <div class="form-group">
+                    <label for="partSpeech">품사</label>
+                    <select id="partSpeech" name="partSpeech" required>
+                        <option value="">선택하세요</option>
+                        <option value="동사">동사</option>
+                        <option value="형용사">형용사</option>
+                        <option value="명사">명사</option>
+                        <option value="부사">부사</option>
+                    </select>
+                </div>
+
+                <!-- 뜻 -->
+                <div class="form-group">
+                    <label for="meaning">뜻</label>
+                    <input type="text" id="meaning" name="meaning" placeholder="뜻을 입력해주세요." required />
+                </div>
+
+                <!-- 예시 문장 -->
+                <div class="form-group">
+                    <label for="exampleSentence">예시 문장</label>
+                    <input type="text" id="exampleSentence" name="exampleSentence" placeholder="예시 문장을 입력하세요." required />
+                </div>
+
+                <!-- 숲지기 한마디 (추가) -->
+                <div class="form-group">
+                    <label for="comment">숲지기 한마디</label>
+                    <textarea id="comment" name="comment" rows="5" placeholder="숲지기 한마디를 입력하세요."></textarea>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="form-buttons">
+                    <button type="button" th:onclick="|location.href='@{/main}'|">취소</button>
+                    <button type="submit" class="submit-btn">등록하기</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <script src="/js/upload-todayword.js"></script>
+</body>
+</html>

@@ -14,6 +14,7 @@ import com.woorix2.vocaforest.word.service.WordService;
 import com.woorix2.vocaforest.wordbook.service.WordbookService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
@@ -38,6 +40,7 @@ public class WordController {
 	private final SearchHistoryService searchHistoryService;
 	private final WordbookService wordbookService;
 	private final TodayWordService todayWordService;
+	private final RedisTemplate<String, Object> redisTemplate;
 
 	@GetMapping("/main")
 	public String mainPage(Model model) {
@@ -76,7 +79,7 @@ public class WordController {
 	public ResponseEntity<Map<String, Object>> getSynonyms(@RequestBody Map<String, String> body) {
 		String word = body.get("word");
 
-		// 🔥 스프링 시큐리티로 현재 로그인 사용자 가져오기
+		// 현재 로그인 사용자 가져오기
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		boolean isLoggedIn = authentication != null && authentication.isAuthenticated()
 				&& !(authentication.getPrincipal() instanceof String && authentication.getPrincipal().equals("anonymousUser"));
@@ -84,48 +87,57 @@ public class WordController {
 		String userEmail = null;
 		if (isLoggedIn) {
 			UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-			userEmail = userDetails.getUsername(); // 이메일 추출
+			userEmail = userDetails.getUsername();
 		}
 
-		WordDto inputWordDto = null;
-		Optional<WordDto> optional = wordService.getWordInfo(word);
+		// 먼저 입력 단어 정보를 words 테이블 또는 표준국어대사전 API에서 조회
+		WordDto inputWordDto = wordService.getWordInfo(word)
+				.orElseGet(() -> dictionaryService.getWordInfoFromDictionary(word)
+						.map(dto -> {
+							wordService.save(dto);
+							return dto;
+						})
+						.orElse(null)
+				);
 
-		if (optional.isPresent()) {
-			inputWordDto = optional.get();
-		} else {
-			Optional<WordDto> dicInfo = dictionaryService.getWordInfoFromDictionary(word);
-
-			if (dicInfo.isPresent()) {
-				WordDto dto = dicInfo.get();
-				wordService.save(dto);
-				inputWordDto = dto;
-			} else {
-				return ResponseEntity.badRequest()
-						.body(Map.of("error", "입력하신 단어는 표준국어대사전에 등록되어 있지 않습니다."));
-			}
+		if (inputWordDto == null) {
+			return ResponseEntity.badRequest()
+					.body(Map.of("error", "입력하신 단어는 표준국어대사전에 등록되어 있지 않습니다."));
 		}
 
+		// Redis에서 캐시된 GPT 결과 먼저 확인
+		List<String> gptWords = (List<String>) redisTemplate.opsForValue().get("synonyms::" + word);
+
+		if (gptWords == null) {
+			// Redis에 없으면 GPT 호출
+			gptWords = chatGPTService.findSynonyms(word);
+			redisTemplate.opsForValue().set("synonyms::" + word, gptWords, Duration.ofDays(365)); // 1일 TTL
+		}
+
+		// 로그인 상태라면 최근 검색어 저장
 		if (userEmail != null) {
-			// 🔥 로그인한 사용자 이메일로 최근 검색어 저장
 			searchHistoryService.saveRecentSearch(userEmail, word);
 		}
 
-		// GPT 결과 처리와 응답 구성은 그대로
-		List<String> gptWords = chatGPTService.findSynonyms(word);
+		// GPT 결과를 표준국어대사전 API로 필터링
 		List<WordDto> filteredSynonyms = new ArrayList<>();
 		for (String gptWord : gptWords) {
-			dictionaryService.getWordInfoFromDictionary(gptWord)
-					.ifPresent(dto -> {
-						filteredSynonyms.add(dto);
-						wordService.save(dto);
-					});
+			dictionaryService.getWordInfoFromDictionary(gptWord).ifPresent(dto -> {
+				filteredSynonyms.add(dto);
+				try {
+					wordService.save(dto); // 중복 무시
+				} catch (Exception e) {
+					// 무시
+				}
+			});
 		}
 
+		// DB(words 테이블) 기준으로 다시 덮어쓰기
 		List<String> wordList = filteredSynonyms.stream()
 				.map(WordDto::getWord)
 				.toList();
-		List<Word> existingWords = wordService.findByWordIn(wordList);
 
+		List<Word> existingWords = wordService.findByWordIn(wordList);
 		Map<String, Word> dbMap = existingWords.stream()
 				.collect(Collectors.toMap(Word::getWord, Function.identity()));
 
@@ -139,12 +151,14 @@ public class WordController {
 			}
 		}
 
+		// 최종 응답
 		Map<String, Object> response = new HashMap<>();
 		response.put("wordInfo", inputWordDto);
 		response.put("synonyms", finalResult);
 
 		return ResponseEntity.ok(response);
 	}
+
 
 	//유사어 검색
 	@PostMapping("/synonyms/by-word")

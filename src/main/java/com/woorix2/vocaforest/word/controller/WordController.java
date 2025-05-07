@@ -201,7 +201,6 @@ public class WordController {
 				finalResult.add(dto); // 국어사전 API 정보 그대로 사용
 			}
 		}
-		System.out.println("finalResult : " + finalResult);
 
 		return ResponseEntity.ok(finalResult);
 	}
@@ -378,7 +377,6 @@ public class WordController {
 		model.addAttribute("totalPages", (pastWords.size() + pageSize - 1) / pageSize);
 
 		model.addAttribute("userWordbook", userWordbook); // ✅ 추가: 단어장 정보도 같이 넘기기
-		System.out.println("userWordbook :" + userWordbook);
 		model.addAttribute("isLoggedIn", user != null);
 		return "todayword";
 	}

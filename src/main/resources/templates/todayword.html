@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>어휘의 숲 오늘의 단어</title>
-    <link rel="stylesheet" href="/css/todayword.css" />
+    <link rel="stylesheet" href="/css/todayword.css"/>
     <script th:inline="javascript">
       const isLoggedIn = [[${isLoggedIn}]];
       let userWordbook = [[${userWordbook}]];
-      console.log(userWordbook);
+
     </script>
 </head>
 <body>
 <div class="wrapper">
     <section class="my-wordbook-section">
         <div class="header">
-            <img src="/img/icon/back.png" alt="뒤로 가기 아이콘" class="back-icon" th:onclick="|location.href='@{/main}'|" />
+            <img src="/img/icon/back.png" alt="뒤로 가기 아이콘" class="back-icon" th:onclick="|location.href='@{/main}'|"/>
             <h2>과거 오늘의 단어</h2>
         </div>
         <div class="word-card-grid">
             <div class="word-card" th:each="todayword, iterStat : ${todaywordList}" th:if="${iterStat.index} < 9">
                 <div class="word-card-header">
                     <h3 class="word-title" th:text="${todayword.word.word}"></h3>
-                    <img src="/img/icon/empty-heart.png" alt="찜한 단어" class="heart-icon" th:attr="data-word=${todayword.word.word}" />
+                    <img src="/img/icon/empty-heart.png" alt="찜한 단어" class="heart-icon"
+                         th:attr="data-word=${todayword.word.word}"/>
                 </div>
                 <p class="word-part-speech">
                     <span>[[${todayword.word.partSpeech}]]</span> | <span>[[${todayword.word.meaning}]]</span>

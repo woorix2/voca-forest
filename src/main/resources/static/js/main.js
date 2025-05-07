@@ -173,7 +173,6 @@
     fetch('/random-word')
       .then(res => res.json())
       .then(word => {
-        console.log("랜덤 단어 응답:", word);
         if (!word || Object.keys(word).length === 0) {
           alert("단어를 불러올 수 없습니다.");
           return;
@@ -416,7 +415,6 @@
     try {
       const response = await fetch('/todayword');
       if (!response.ok) {
-        console.log("오늘의 단어 없음");
         return;
       }
 

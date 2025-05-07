@@ -68,7 +68,6 @@ public class ChatGPTService {
 		Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
 
 		String gptResponse = message.get("content").toString();
-		System.out.println("gptResponse " + gptResponse);
 		// 줄바꿈 기준으로 분리
 		return Arrays.stream(gptResponse.split("\\R"))
 				.map(String::trim)

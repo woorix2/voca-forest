@@ -12,6 +12,7 @@ public class SearchHistoryService {
 
 	private final StringRedisTemplate redisTemplate;
 
+	//검색어 저장
 	public void saveRecentSearch(String email, String word) {
 		String key = "recent:" + email;
 
@@ -20,11 +21,13 @@ public class SearchHistoryService {
 		redisTemplate.opsForList().trim(key, 0, 4); // 5개만 유지
 	}
 
+	//최근 검색어 조회
 	public List<String> getRecentSearches(String email) {
 		String key = "recent:" + email;
 		return redisTemplate.opsForList().range(key, 0, -1);
 	}
 
+	//최근 검색어 삭제
 	public void removeSearch(String email, String word) {
 		String key = "recent:" + email;
 		redisTemplate.opsForList().remove(key, 1, word); // 최근검색어 리스트에서 단어 하나 삭제

@@ -3,7 +3,6 @@ package com.woorix2.vocaforest.word.service;
 import com.woorix2.vocaforest.word.dto.WordDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,10 +19,10 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 public class DictionaryService {
-
 	@Value("${dict.api.key}")
 	private String apiKey;
 
+	//단어 조회
 	public Optional<WordDto> getWordInfoFromDictionary(String word) {
 		try {
 			// 기본조회
@@ -63,12 +62,14 @@ public class DictionaryService {
 		}
 	}
 
+	//태그 추출 함수
 	private String extract(String xml, String regex) {
 		Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(xml);
 		if (matcher.find()) return matcher.group(1).replaceAll("<.*?>", "").trim();
 		return "-";
 	}
 
+	//태그 추출 함수
 	private List<String> extractMultiple(String xml, String regex) {
 		Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(xml);
 		List<String> results = new ArrayList<>();

@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Table(name = "today_words")
-public class       TodayWord {
+public class	TodayWord {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,5 +25,5 @@ public class       TodayWord {
 
 	private LocalDate date;
 
-	private String comment; // 감상평 (nullable)
+	private String comment;
 }

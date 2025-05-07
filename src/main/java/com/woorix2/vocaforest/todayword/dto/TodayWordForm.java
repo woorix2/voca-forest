@@ -12,5 +12,5 @@ public class TodayWordForm {
 	private String partSpeech;
 	private String meaning;
 	private String exampleSentence;
-	private String comment; // 숲지기 한마디
+	private String comment;
 }

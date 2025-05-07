@@ -1,18 +1,14 @@
 package com.woorix2.vocaforest.word.service;
 
-import com.woorix2.vocaforest.todayword.entity.TodayWord;
 import com.woorix2.vocaforest.todayword.repository.TodayWordRepository;
 import com.woorix2.vocaforest.word.dto.WordDto;
 import com.woorix2.vocaforest.word.entity.Word;
 import com.woorix2.vocaforest.word.repository.WordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +28,7 @@ public class WordService {
 		}
 	}
 
+	//단어 상세
 	public List<Word> findByWordIn(List<String> wordList) {
 		List<Word> existingWords = wordRepository.findByWordIn(wordList);
 

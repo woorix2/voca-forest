@@ -42,6 +42,7 @@ public class WordController {
 	private final TodayWordService todayWordService;
 	private final RedisTemplate<String, Object> redisTemplate;
 
+	//메인 페이지
 	@GetMapping("/main")
 	public String mainPage(Model model) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -74,7 +75,7 @@ public class WordController {
 		return "main";
 	}
 
-	// 유사어 검색
+	//유사어 검색
 	@PostMapping("/synonyms")
 	public ResponseEntity<Map<String, Object>> getSynonyms(@RequestBody Map<String, String> body) {
 		String word = body.get("word");
@@ -151,7 +152,7 @@ public class WordController {
 			}
 		}
 
-		// 최종 응답
+		//최종 응답
 		Map<String, Object> response = new HashMap<>();
 		response.put("wordInfo", inputWordDto);
 		response.put("synonyms", finalResult);
@@ -205,7 +206,7 @@ public class WordController {
 		return ResponseEntity.ok(finalResult);
 	}
 
-	// 최근 검색어 불러오기
+	//최근 검색어 불러오기
 	@GetMapping("/recent-search")
 	@ResponseBody
 	public List<String> getRecentSearches() {
@@ -227,7 +228,7 @@ public class WordController {
 	public void saveSearch(@RequestBody Map<String, String> body) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		if (authentication == null || !authentication.isAuthenticated() ||	(authentication.getPrincipal() instanceof String)) {
+		if (authentication == null || !authentication.isAuthenticated() || (authentication.getPrincipal() instanceof String)) {
 			// 로그인 안한 사용자는 저장하지 않음
 			return;
 		}
@@ -350,7 +351,7 @@ public class WordController {
 		return ResponseEntity.ok(response);
 	}
 
-	// 과거의 오늘의 단어 조회
+	//과거의 오늘의 단어 조회
 	@GetMapping("/todayword/history")
 	public String viewPastTodayWords(@RequestParam(name = "page", defaultValue = "0") int page, Model model, HttpSession session) {
 		User user = (User) session.getAttribute("user");
@@ -382,7 +383,7 @@ public class WordController {
 		return "todayword";
 	}
 
-	// 최근 검색어 불러오기
+	//최근 검색어 불러오기
 	@GetMapping("/random-word")
 	@ResponseBody
 	public WordDto getRandomWord() {

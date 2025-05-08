@@ -1,6 +1,6 @@
 # 🌳 어휘의 숲 (voca-forest)
 
-**단어를 검색하고, 유사어를 추천받으며, 나만의 단어장을 만들어가는 웹사이트**
+**단어를 검색하고, 유사어를 추천받으며, 나만의 단어장을 만들어가는 웹사이트입니다. 어휘의 숲을 탐험하며 어휘력을 길러보세요!**
 
 ---
 
@@ -17,37 +17,57 @@
 
 ## 🛠️ 개발환경
 
-| 항목 | 내용 |
-|:--|:--|
-| Language | Java 17 |
-| Framework | Spring Boot 3, Spring Security |
-| ORM | JPA (Hibernate) |
-| Database | MariaDB |
-| Frontend | HTML5, CSS3, JavaScript, Thymeleaf |
-| Build Tool | Gradle |
-| Version Control | Git, GitHub |
-| IDE | IntelliJ IDEA (Community Edition), DBeaver |
-| API 연동 | OpenAI API (유사어 추천), 표준국어대사전 API (검증) |
-| 기타 | Redis (검색 캐시), BCrypt (비밀번호 암호화) |
+| 항목              | 내용                                         |
+|:----------------|:-------------------------------------------|
+| Language        | Java 17                                    |
+| Framework       | Spring Boot 3, Spring Security             |
+| ORM             | JPA (Hibernate)                            |
+| Database        | MariaDB                                    |
+| Frontend        | HTML5, CSS3, JavaScript, Thymeleaf         |
+| Build Tool      | Gradle                                     |
+| Version Control | Git, GitHub                                |
+| IDE             | IntelliJ IDEA (Community Edition), DBeaver |
+| API 연동          | OpenAI API (유사어 추천), 표준국어대사전 API (검증)      |
+| 기타              | Redis (검색 캐시), BCrypt (비밀번호 암호화)           |
 
 ---
 
 ## ✨ 주요 기능
 
 ### 🔒 회원 기능
+
 - 이메일 인증 기반 회원가입
 - 로그인 / 로그아웃 (Spring Security 기반)
 - 이메일/생년월일로 아이디(이메일) 찾기
 - 비밀번호 재설정
 
 ### 📚 단어 기능
-- 단어 검색 및 유사어 추천(Open AI API 기반)
+
+- 단어 검색 및 유사어 추천 (OpenAI API 기반)
 - 표준국어대사전 API 기반 단어 검증
 - "나만의 단어장" 저장/삭제 기능
 - "최근 검색어" 저장/삭제 기능
 - "아무 단어 뽑기"로 랜덤 단어 조회 기능
 
 ### 📝 오늘의 단어
+
 - 관리자(ROLE_ADMIN)만 등록 가능
 - 매일 1개 단어를 추천 및 관리
 - 숲지기 한마디(comment) 추가 가능
+
+---
+
+## 🚀 배포 (Deployment)
+
+### 1. 서버 환경
+
+- AWS EC2 (Ubuntu 22.04 LTS)
+- Elastic IP를 고정하여 도메인 연결
+- MariaDB 10.6 설치 및 설정
+- Redis 설치 및 적용
+
+### 2. 도메인 연결
+
+- 가비아에서 `voca-forest.site` 도메인 구매
+- A 레코드 설정으로 EC2 퍼블릭 IP 연결
+- EC2 보안 그룹에서 HTTP(80), HTTPS(443) 포트 오픈

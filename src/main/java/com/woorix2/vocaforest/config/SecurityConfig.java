@@ -20,7 +20,7 @@ public class SecurityConfig {
 		http
 				.csrf(csrf -> csrf.disable()) // 필요시 활성화 가능
 				.authorizeHttpRequests(authz -> authz
-						.requestMatchers("/", "/main", "/signup", "/login", "/find-email", "/find-password", "/reset-password", "/todayword", "/random-word", "/synonyms", "/css/**", "/js/**", "/img/**").permitAll()
+						.requestMatchers("/", "/main", "/signup", "/login", "/find-email", "/find-password", "/reset-password", "/todayword", "/random-word", "/synonyms", "/synonyms/by-word", "/todayword/history", "/css/**", "/js/**", "/img/**").permitAll()
 						.requestMatchers("/upload-todayword", "/today/register").hasRole("ADMIN") // 관리자만
 						.anyRequest().authenticated() // 나머지는 로그인 필요
 				)

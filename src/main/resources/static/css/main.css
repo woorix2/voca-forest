@@ -188,7 +188,6 @@ html {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  border-radius: 20px 0 0 20px;
   overflow: hidden;
 }
 

@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const submitBtn = document.querySelector('.submit-btn');
   const passwordInput = document.querySelector('input[name="password"]');
   const checkPasswordInput = document.querySelector('input[name="check-password"]');
+  const tokenInput = document.querySelector('input[name="token"]');
+
 
   // '설정' 버튼 클릭 이벤트
   submitBtn.addEventListener('click', async (e) => {
@@ -9,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const password = passwordInput.value.trim();
     const checkPassword = checkPasswordInput.value.trim();
+    const token = tokenInput.value; // ✅ 여기서 token 가져오기
 
     // 유효성 검사
     if (!password || !checkPassword) {
@@ -25,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const response = await fetch('/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ token, password }) // token 포함
       });
 
       if (response.ok) {

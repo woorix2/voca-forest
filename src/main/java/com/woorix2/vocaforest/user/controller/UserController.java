@@ -1,13 +1,17 @@
 package com.woorix2.vocaforest.user.controller;
 
 
-import com.woorix2.vocaforest.user.dto.*;
+import com.woorix2.vocaforest.user.dto.FindEmailRequestDto;
+import com.woorix2.vocaforest.user.dto.FindPasswordRequestDto;
+import com.woorix2.vocaforest.user.dto.ResetPasswordRequestDto;
+import com.woorix2.vocaforest.user.dto.UserSignUpRequestDto;
 import com.woorix2.vocaforest.user.entity.User;
+import com.woorix2.vocaforest.user.service.EmailService;
 import com.woorix2.vocaforest.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,13 +19,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class UserController {
 	private final UserService userService;
+	private final EmailService emailService;
+
+	private final RedisTemplate<String, String> redisTemplate;
 
 	//회원가입 페이지
 	@GetMapping("/signup")
@@ -79,44 +88,50 @@ public class UserController {
 
 	//비밀번호 찾기
 	@PostMapping("/find-password")
-	public ResponseEntity<?> findPassword(@RequestBody FindPasswordRequestDto dto, HttpSession session) {
-		Optional<User> userOpt = userService.findUserForPasswordReset(dto);
+	public ResponseEntity<?> findPassword(@RequestBody FindPasswordRequestDto dto) {
+		Optional<User> user = userService.findUserForPasswordReset(dto);
 
-		if (userOpt.isPresent()) {
-			session.setAttribute("resetEmail", userOpt.get().getEmail()); // 세션에 저장
-			return ResponseEntity.ok().build(); // OK 응답
-		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("일치하는 사용자가 없습니다.");
+		if (user.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("일치하는 사용자가 없습니다");
 		}
+
+		String token = UUID.randomUUID().toString();
+		String email = user.get().getEmail();
+
+		redisTemplate.opsForValue().set("reset:" + token, email, Duration.ofMinutes(15));
+
+		String resetLink = "https://vofa-forest.site/reset-password?token=" + token; //운영
+		//String resetLink = "http://localhost:8080/reset-password?token=" + token; //개발
+		System.out.println("email " + email);
+		emailService.sendResetLink(email, resetLink);
+		return ResponseEntity.ok("비밀번호 재설정 링크를 이메일로 전송했습니다.");
 	}
 
 	// 비밀번호 재설정 페이지
 	@GetMapping("/reset-password")
-	public String resetPasswordPage(HttpSession session, Model model) {
-		String email = (String) session.getAttribute("resetEmail");
+	public String resetPasswordPage(@RequestParam("token") String token, Model model) {
+		String email = redisTemplate.opsForValue().get("reset:" + token);
 
 		if (email == null) {
-			// 세션에 이메일 없으면 비정상 접근 -> 로그인 페이지로 리다이렉트
-			return "redirect:/login";
+			model.addAttribute("error", "유효하지 않은 링크이거나 만료되었습니다.");
 		}
 
-		model.addAttribute("email", email); // 필요하면 숨겨진 input에 넣을 수도 있음
+		model.addAttribute("token", token);
 		return "reset-password";
 	}
 
 	// 비밀번호 재설정
 	@PostMapping("/reset-password")
-	public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequestDto dto, HttpSession session) {
-		String email = (String) session.getAttribute("resetEmail");
+	public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequestDto dto) {
+		String email = redisTemplate.opsForValue().get("reset:" + dto.getToken());
 
 		if (email == null) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("비정상적인 요청입니다.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않응 요청입니다.");
 		}
 
 		boolean success = userService.resetPassword(email, dto.getPassword());
-
 		if (success) {
-			session.removeAttribute("resetEmail"); // 비밀번호 변경 후 세션 정리
+			redisTemplate.delete("reset:" + dto.getToken()); // 한 번 사용한 토큰 제거
 			return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 변경 실패");

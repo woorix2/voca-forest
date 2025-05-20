@@ -447,4 +447,21 @@
     }
   }
 
+  // 모달 외부 클릭 시 닫기
+  document.addEventListener("click", function (e) {
+    const modals = [wordModal, introModal, mypageModal, todayWordModal, randomWordModal];
+    const isAnyModalOpen = modals.some(modal => modal.classList.contains("show"));
+    const isInsideModal = modals.some(modal => modal.contains(e.target));
+    const isButton = e.target.closest("button");
 
+    // 랜덤단어 클릭 시 예외 처리
+    const isFloatingWord = e.target.closest(".floating-words span");
+
+    if (isAnyModalOpen && !isInsideModal && !isButton && !isFloatingWord) {
+      closeModal();
+      closeIntroModal();
+      closeMypageModal();
+      closeTodayWordModal();
+      closeRandomWordModal();
+    }
+  });

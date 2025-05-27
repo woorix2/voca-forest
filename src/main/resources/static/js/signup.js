@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    fetch('/email/send-code', {
+    fetch('/email/verification-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email })
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    fetch('/email/verify-code', {
+    fetch('/email/verification-code/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, code })

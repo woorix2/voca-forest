@@ -18,7 +18,7 @@ public class EmailController {
 	private final EmailService emailService;
 
 	//인증 코드 전송
-	@PostMapping("/send-code")
+	@PostMapping("/verification-code")
 	public ResponseEntity<String> sendCode(@RequestBody Map<String, String> body) {
 		String email = body.get("email");
 		emailService.sendVerificationCode(email);
@@ -26,7 +26,7 @@ public class EmailController {
 	}
 
 	//인증번호 확인
-	@PostMapping("/verify-code")
+	@PostMapping("/verification-code/verify")
 	public ResponseEntity<Map<String, Object>> verifyCode(@RequestBody Map<String, String> body) {
 		String email = body.get("email");
 		String code = body.get("code");

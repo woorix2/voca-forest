@@ -26,63 +26,55 @@ public class WordbookController {
 	private final WordService wordService;
 
 	// 단어장 저장
-	@PostMapping("/save")
-	@ResponseBody
+	@PostMapping
 	public ResponseEntity<?> saveWord(@RequestBody Map<String, String> body) {
 		String wordName = body.get("word");
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		if (authentication == null || !authentication.isAuthenticated() ||	(authentication.getPrincipal() instanceof String)) {
+		if (authentication == null || !authentication.isAuthenticated() || (authentication.getPrincipal() instanceof String)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 		}
 
-		// Principal 꺼내서 CustomUserDetails로 캐스팅
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-		Integer userId = userDetails.getUserId();  // ✅ userId 꺼내기
+		Integer userId = userDetails.getUserId();
 
 		wordService.getWordInfo(wordName).ifPresent(wordDto -> {
-			wordbookService.save(userId, wordDto.getWord()); // ✅ userId 사용
+			wordbookService.save(userId, wordDto.getWord());
 		});
 
 		return ResponseEntity.ok().build();
 	}
 
 	// 단어장 삭제
-	@PostMapping("/remove")
-	@ResponseBody
-	public ResponseEntity<?> removeWord(@RequestBody Map<String, String> body) {
-		String wordName = body.get("word");
+	@DeleteMapping("/{word}")
+	public ResponseEntity<?> removeWord(@PathVariable("word") String word) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		if (authentication == null || !authentication.isAuthenticated() ||	(authentication.getPrincipal() instanceof String)) {
+		if (authentication == null || !authentication.isAuthenticated() || (authentication.getPrincipal() instanceof String)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 		}
 
-		// Principal 꺼내서 CustomUserDetails로 캐스팅
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-		Integer userId = userDetails.getUserId();  // ✅ userId 꺼내기
+		Integer userId = userDetails.getUserId();
 
-		wordbookService.delete(userId, wordName); // ✅ 바로 삭제 호출
-
+		wordbookService.delete(userId, word);
 		return ResponseEntity.ok().build();
 	}
 
 	// 단어장 목록 조회
-	@GetMapping("/list")
+	@GetMapping
 	public String wordbookPage(@RequestParam(name = "page", defaultValue = "0") int page, Model model, HttpSession session) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication == null || !authentication.isAuthenticated() || (authentication.getPrincipal() instanceof String)) {
-			return "redirect:/login"; // 로그인 안한 사용자는 로그인 페이지로 보내기
+			return "redirect:/login";
 		}
 
-		// Principal 꺼내서 CustomUserDetails로 캐스팅
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-		Integer userId = userDetails.getUserId();  // ✅ userId 꺼내기
+		Integer userId = userDetails.getUserId();
 
 		List<WordbookDto> wordbookList = wordbookService.getWordbookListDto(userId);
-
-		int pageSize = 9; // 한 페이지에 9개
+		int pageSize = 9;
 		int start = page * pageSize;
 		int end = Math.min(start + pageSize, wordbookList.size());
 

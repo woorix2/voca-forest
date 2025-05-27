@@ -43,6 +43,7 @@ public class EmailService {
 		return savedCode != null && savedCode.equals(code);
 	}
 
+	// 비밀번호 재설정 링크 이메일 발송
 	public void sendResetLink(String to, String link) {
 		try {
 			MimeMessage message = mailSender.createMimeMessage();

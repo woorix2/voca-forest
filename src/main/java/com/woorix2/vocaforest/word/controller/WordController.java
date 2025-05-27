@@ -3,7 +3,6 @@ package com.woorix2.vocaforest.word.controller;
 import com.woorix2.vocaforest.todayword.dto.TodayWordForm;
 import com.woorix2.vocaforest.todayword.entity.TodayWord;
 import com.woorix2.vocaforest.todayword.service.TodayWordService;
-import com.woorix2.vocaforest.user.entity.User;
 import com.woorix2.vocaforest.user.security.CustomUserDetails;
 import com.woorix2.vocaforest.word.dto.WordDto;
 import com.woorix2.vocaforest.word.entity.Word;
@@ -12,7 +11,6 @@ import com.woorix2.vocaforest.word.service.DictionaryService;
 import com.woorix2.vocaforest.word.service.SearchHistoryService;
 import com.woorix2.vocaforest.word.service.WordService;
 import com.woorix2.vocaforest.wordbook.service.WordbookService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -76,9 +74,9 @@ public class WordController {
 	}
 
 	//유사어 검색
-	@PostMapping("/synonyms")
-	public ResponseEntity<Map<String, Object>> getSynonyms(@RequestBody Map<String, String> body) {
-		String word = body.get("word");
+	@GetMapping("/words/{word}/synonyms")
+	public ResponseEntity<Map<String, Object>> getSynonyms(@PathVariable String word) {
+		//String word = body.get("word");
 
 		// 현재 로그인 사용자 가져오기
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -160,18 +158,18 @@ public class WordController {
 		return ResponseEntity.ok(response);
 	}
 
-
 	//유사어 검색
-	@PostMapping("/synonyms/by-word")
-	public ResponseEntity<List<WordDto>> getSynonymsByWord(@RequestBody Map<String, String> body) {
-		String word = body.get("word");
+	@GetMapping("/words/{word}/synonyms/names")
+	public ResponseEntity<List<WordDto>> getSynonymsByWord(@PathVariable String word) {
+		//String word = body.get("word");
 
 		// GPT 유사어 단어명 리스트
 		List<String> gptWords = chatGPTService.findSynonyms(word);
 
 		// 표준국어대사전 API에서 각 단어 정보 가져오기
 		List<WordDto> filteredSynonyms = new ArrayList<>();
-		for (String gptWord : gptWords) {
+		for (
+				String gptWord : gptWords) {
 			dictionaryService.getWordInfoFromDictionary(gptWord).ifPresent(dto -> {
 				filteredSynonyms.add(dto);
 				try {
@@ -193,7 +191,8 @@ public class WordController {
 		// 4. DB에 있는 단어는 덮어쓰기
 		List<WordDto> finalResult = new ArrayList<>();
 
-		for (WordDto dto : filteredSynonyms) {
+		for (
+				WordDto dto : filteredSynonyms) {
 			if (dbMap.containsKey(dto.getWord())) {
 				Word w = dbMap.get(dto.getWord());
 				finalResult.add(new WordDto(w.getWord(), w.getPartSpeech(), w.getMeaning(), w.getExampleSentence()));
@@ -206,7 +205,7 @@ public class WordController {
 	}
 
 	//최근 검색어 불러오기
-	@GetMapping("/recent-search")
+	@GetMapping("/search-history")
 	@ResponseBody
 	public List<String> getRecentSearches() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -222,7 +221,7 @@ public class WordController {
 	}
 
 	//최근 검색어에 저장
-	@PostMapping("/save-search")
+	@PostMapping("/search-history")
 	@ResponseBody
 	public void saveSearch(@RequestBody Map<String, String> body) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -242,42 +241,21 @@ public class WordController {
 	}
 
 	//최근 검색어 삭제
-	@PostMapping("/remove-search")
+	@DeleteMapping("/search-history/{word}")
 	@ResponseBody
-	public ResponseEntity<String> removeRecentSearch(@RequestBody Map<String, String> body) {
+	public ResponseEntity<String> removeRecentSearch(@PathVariable String word) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		if (authentication == null || !authentication.isAuthenticated() || (authentication.getPrincipal() instanceof String)) {
+		if (authentication == null || !authentication.isAuthenticated() ||
+				(authentication.getPrincipal() instanceof String)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 		}
 
-		// Principal 꺼내서 CustomUserDetails로 캐스팅
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-		String userEmail = userDetails.getUserEmail();  // ✅ userId 꺼내기
+		String userEmail = userDetails.getUserEmail();
 
-		String word = body.get("word");
 		searchHistoryService.removeSearch(userEmail, word);
 		return ResponseEntity.ok("OK");
-	}
-
-	//나만의 단어장 목록 조회
-	@GetMapping("/list")
-	@ResponseBody
-	public List<String> getWordbookList() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-		if (authentication == null || !authentication.isAuthenticated() || (authentication.getPrincipal() instanceof String)) {
-			throw new IllegalStateException("로그인한 사용자만 조회 가능합니다.");
-		}
-
-		// Principal 꺼내서 CustomUserDetails로 캐스팅
-		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-		Integer userId = userDetails.getUserId();  // ✅ userId 꺼내기
-
-		return wordbookService.getWordbookList(userId)
-				.stream()
-				.map(Word::getWord) // Word 객체 → 단어명(String)으로 변환
-				.toList();
 	}
 
 	//오늘의 단어 등록 페이지
@@ -306,7 +284,7 @@ public class WordController {
 	}
 
 	//오늘의 단어 등록
-	@PostMapping("/today/register")
+	@PostMapping("/today-words")
 	public String registerTodayWord(@ModelAttribute TodayWordForm form, RedirectAttributes redirectAttributes) {
 		try {
 			WordDto wordDto = new WordDto(
@@ -327,7 +305,7 @@ public class WordController {
 	}
 
 	//오늘의 단어 조회
-	@GetMapping("/todayword")
+	@GetMapping("/today-words/today")
 	@ResponseBody
 	public ResponseEntity<?> getTodayWord() {
 		LocalDate today = LocalDate.now();
@@ -351,21 +329,25 @@ public class WordController {
 	}
 
 	//과거의 오늘의 단어 조회
-	@GetMapping("/todayword/history")
-	public String viewPastTodayWords(@RequestParam(name = "page", defaultValue = "0") int page, Model model, HttpSession session) {
-		User user = (User) session.getAttribute("user");
+	@GetMapping("/today-word/history")
+	public String viewPastTodayWords(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		boolean isLoggedIn = authentication != null && authentication.isAuthenticated()
+				&& !(authentication.getPrincipal() instanceof String && authentication.getPrincipal().equals("anonymousUser"));
 
 		List<String> userWordbook = List.of();
 
-		if (user != null) {
-			userWordbook = wordbookService.getWordbookList(user.getUserId())
+		if (isLoggedIn) {
+			CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+			Integer userId = userDetails.getUserId();
+			userWordbook = wordbookService.getWordbookList(userId)
 					.stream()
 					.map(Word::getWord)
 					.toList();
 		}
 
 		List<TodayWord> pastWords = todayWordService.getPastTodayWords();
-
 		int pageSize = 9;
 		int start = page * pageSize;
 		int end = Math.min(start + pageSize, pastWords.size());
@@ -375,14 +357,14 @@ public class WordController {
 		model.addAttribute("todaywordList", currentPageList);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", (pastWords.size() + pageSize - 1) / pageSize);
+		model.addAttribute("userWordbook", userWordbook);
+		model.addAttribute("isLoggedIn", isLoggedIn);
 
-		model.addAttribute("userWordbook", userWordbook); // ✅ 추가: 단어장 정보도 같이 넘기기
-		model.addAttribute("isLoggedIn", user != null);
 		return "todayword";
 	}
 
 	//최근 검색어 불러오기
-	@GetMapping("/random-word")
+	@GetMapping("/words/random")
 	@ResponseBody
 	public WordDto getRandomWord() {
 		return wordService.findRandomWord();

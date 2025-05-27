@@ -23,7 +23,7 @@
         </button>
 
         <!-- 로그인한 사용자만 보여주기 -->
-        <button class="logout-btn" sec:authorize="isAuthenticated()" onclick="location.href='/wordbook/list'">
+        <button class="logout-btn" sec:authorize="isAuthenticated()" onclick="location.href='/wordbook'">
             <img src="/img/icon/white-heart.png" alt="나만의 단어장 아이콘"/>
         </button>
 
@@ -103,7 +103,7 @@
             <div class="comment">
                 <div class="second-tag">숲지기의 한마디</div>
             </div>
-            <button class="view-history" th:onclick="|location.href='@{/todayword/history}'|">이전 단어들 조회</button>
+            <button class="view-history" th:onclick="|location.href='@{/today-word/history}'|">이전 단어들 조회</button>
         </div>
     </div>
 
@@ -219,9 +219,9 @@
             <!-- 나만의 단어장 -->
             <div class="section">
                 <div class="wordbook-serction">
-                    <h4 th:onclick="|location.href='@{/wordbook/list}'|">나만의 단어장</h4>
+                    <h4 th:onclick="|location.href='@{/wordbook}'|">나만의 단어장</h4>
                     <img src="/img/icon/forward.png" alt="나만의 단어장 목록 이동 아이콘" class="forward-icon"
-                         th:onclick="|location.href='@{/wordbook/list}'|"/>
+                         th:onclick="|location.href='@{/wordbook}'|"/>
                 </div>
                 <ul class="word-list" id="my-wordbook-list">
                     <li th:each="word, iterStat : ${wordbookList}" th:if="${iterStat.index} < 5">

@@ -10,10 +10,8 @@ document.addEventListener('click', async function(e) {
 
     if (isLiked) {
       // 단어장 삭제 요청
-      const res = await fetch('/wordbook/remove', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word })
+      const res = await fetch(`/wordbook/${encodeURIComponent(word)}`, {
+          method: 'DELETE'
       });
 
       if (res.ok) {
@@ -27,7 +25,6 @@ document.addEventListener('click', async function(e) {
       }
     }
   }
-
 });
 
 function showToast(message) {

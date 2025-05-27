@@ -35,34 +35,41 @@
     }
 
     // 유사어 요청
-    fetch('/synonyms/by-word', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word: wordName })
+    fetch(`/words/${encodeURIComponent(wordName)}/synonyms/names`, {
+      method: 'GET'
     })
-    .then(response => response.json())
-    .then(data => {
-      data.forEach(syn => {
-        const synonymDiv = document.createElement("div");
-        synonymDiv.classList.add("search-word-info");
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("유사어를 불러오는 데 실패했습니다.");
+        }
+        return response.json();
+      })
+      .then(data => {
+        data.forEach(syn => {
+          const synonymDiv = document.createElement("div");
+          synonymDiv.classList.add("search-word-info");
 
-        // 유사어마다 하트 상태 설정
-        const heartIconSrc = userWordbook.includes(syn.word)
+          const heartIconSrc = userWordbook.includes(syn.word)
             ? '/img/icon/full-heart.png'
             : '/img/icon/empty-heart.png';
 
-        synonymDiv.innerHTML = `
-          <h2 class="search-word-title">${syn.word}</h2>
-          <img src="${heartIconSrc}" class="heart-icon" data-word="${syn.word}" />
-          <p class="search-word-type">${syn.partSpeech} · ${syn.meaning}</p>
-          <div class="search-word-example">
-            <span class="example-tag">예시 문장</span>
-            <p>${syn.exampleSentence}</p>
-          </div>
-        `;
-        wordModalContent.appendChild(synonymDiv);
+          synonymDiv.innerHTML = `
+            <h2 class="search-word-title">${syn.word}</h2>
+            <img src="${heartIconSrc}" class="heart-icon" data-word="${syn.word}" />
+            <p class="search-word-type">${syn.partSpeech} · ${syn.meaning}</p>
+            <div class="search-word-example">
+              <span class="example-tag">예시 문장</span>
+              <p>${syn.exampleSentence}</p>
+            </div>
+          `;
+
+          wordModalContent.appendChild(synonymDiv);
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        alert("유사어를 불러오는 데 실패했습니다.");
       });
-    });
 
     randomWordModal.classList.remove("show");
     mypageModal.classList.remove("show");
@@ -99,7 +106,7 @@
     wrapper.classList.add("modal-open");
     mypageModal.classList.add("show");
 
-    fetch('/recent-search')
+    fetch('/search-history')
       .then(res => res.json())
       .then(words => {
         const container = document.querySelector("#recent-search-section .word-list");
@@ -126,21 +133,19 @@
           });
 
           container.querySelectorAll(".remove-search").forEach(button => {
-            button.addEventListener("click", async function() {
+            button.addEventListener("click", async function () {
               const word = this.dataset.word;
               if (confirm(`'${word}' 검색어를 삭제할까요?`)) {
-                const res = await fetch('/remove-search', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ word })
+                const res = await fetch(`/search-history/${encodeURIComponent(word)}`, {
+                  method: 'DELETE'
                 });
                 if (res.ok) {
                   this.parentElement.remove();
                 } else if (res.status === 401) {
-                    alert('로그인이 필요합니다. 로그인 후 다시 시도해주세요.');
-                    location.href = '/login';
+                  alert('로그인이 필요합니다. 로그인 후 다시 시도해주세요.');
+                  location.href = '/login';
                 } else {
-                    alert('삭제에 실패했습니다.');
+                  alert('삭제에 실패했습니다.');
                 }
               }
             });
@@ -170,7 +175,7 @@
   }
 
   function openRandomWordModal() {
-    fetch('/random-word')
+    fetch('/words/random')
       .then(res => res.json())
       .then(word => {
         if (!word || Object.keys(word).length === 0) {
@@ -297,19 +302,17 @@
       alert("단어를 입력해주세요!");
       return;
     }
-    const response = await fetch('/synonyms', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word })
+    const response = await fetch(`/words/${encodeURIComponent(word)}/synonyms`, {
+        method: 'GET',
     });
 
+    const data = await response.json(); // 여기서만 한 번만 호출
+
     if (!response.ok) {
-      const errorData = await response.json();
       alert(errorData.error || "오류가 발생했습니다.");
       return;
     }
 
-    const data = await response.json();
     const wordInfo = data.wordInfo;
     const synonymList = data.synonyms;
 
@@ -359,7 +362,7 @@
   }
 
   //단어장 저장 및 삭제 처리(하트버튼)
-  document.addEventListener('click', async function(e) {
+  document.addEventListener('click', async function (e) {
     const target = e.target;
 
     if (target.classList.contains('heart-icon')) {
@@ -375,10 +378,9 @@
       const isLiked = target.src.includes('full-heart');
 
       if (isLiked) {
-        const res = await fetch('/wordbook/remove', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ word })
+        // ✅ DELETE 요청으로 변경 + word를 경로에 포함
+        const res = await fetch(`/wordbook/${encodeURIComponent(word)}`, {
+          method: 'DELETE'
         });
 
         if (res.ok) {
@@ -386,12 +388,12 @@
           target.src = '/img/icon/empty-heart.png';
           target.alt = '빈 하트 이미지';
           userWordbook = userWordbook.filter(w => w !== word);
-
         } else {
           alert("단어장에서 삭제 실패");
         }
       } else {
-        const res = await fetch('/wordbook/save', {
+        // ✅ 저장은 그대로 POST
+        const res = await fetch('/wordbook', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ word })
@@ -401,7 +403,6 @@
           target.src = '/img/icon/full-heart.png';
           target.alt = '채워진 하트 이미지';
           userWordbook.push(word);
-
           showToast("단어장에 저장되었습니다.");
         } else {
           alert("단어장에 저장 실패");
@@ -413,7 +414,7 @@
   //오늘의 단어 조회
   async function loadTodayWord() {
     try {
-      const response = await fetch('/todayword');
+      const response = await fetch('/today-words/today');
       if (!response.ok) {
         return;
       }

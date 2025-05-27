@@ -36,15 +36,14 @@
 
         <!-- 페이지네이션 -->
         <div class="pagination">
-            <a th:if="${currentPage > 0}" th:href="@{/wordbook/list(page=${currentPage - 1})}">&lt;</a>
+            <a th:if="${currentPage > 0}" th:href="@{/wordbook(page=${currentPage - 1})}">&lt;</a>
             <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-          <a th:if="${i < totalPages}" th:href="@{/wordbook/list(page=${i})}" th:text="${i + 1}"
+          <a th:if="${i < totalPages}" th:href="@{/wordbook(page=${i})}" th:text="${i + 1}"
              th:classappend="${i == currentPage} ? 'active' : ''"></a>
         </span>
-            <a th:if="${currentPage < totalPages - 1}" th:href="@{/wordbook/list(page=${currentPage + 1})}">&gt;</a>
+            <a th:if="${currentPage < totalPages - 1}" th:href="@{/wordbook(page=${currentPage + 1})}">&gt;</a>
         </div>
     </section>
-
 </div>
 
 <div id="toast" class="toast-message"></div>

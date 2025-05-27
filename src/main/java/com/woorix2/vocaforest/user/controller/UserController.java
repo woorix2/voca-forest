@@ -39,7 +39,7 @@ public class UserController {
 	}
 
 	//회원가입
-	@PostMapping("/signup")
+	@PostMapping("/users")
 	public String signUp(@ModelAttribute UserSignUpRequestDto dto, Model model, RedirectAttributes redirectAttributes) {
 		try {
 			userService.signUp(dto);
@@ -63,13 +63,13 @@ public class UserController {
 	}
 
 	// 이메일(아이디 찾기) 페이지
-	@GetMapping("find-email")
+	@GetMapping("/find-email")
 	public String findEmailForm() {
 		return "find-email";
 	}
 
 	// 이메일(아이디 찾기)
-	@PostMapping("find-email")
+	@PostMapping("/users/find-email")
 	public ResponseEntity<?> findEmail(@RequestBody FindEmailRequestDto dto) {
 		Optional<User> user = userService.findEmail(dto);
 
@@ -81,13 +81,13 @@ public class UserController {
 	}
 
 	// 비밀번호 찾기 페이지
-	@GetMapping("find-password")
+	@GetMapping("/find-password")
 	public String findPasswordForm() {
 		return "find-password";
 	}
 
 	//비밀번호 찾기
-	@PostMapping("/find-password")
+	@PostMapping("/users/password-reset-request")
 	public ResponseEntity<?> findPassword(@RequestBody FindPasswordRequestDto dto) {
 		Optional<User> user = userService.findUserForPasswordReset(dto);
 
@@ -100,7 +100,7 @@ public class UserController {
 
 		redisTemplate.opsForValue().set("reset:" + token, email, Duration.ofMinutes(15));
 
-		String resetLink = "https://vofa-forest.site/reset-password?token=" + token; //운영
+		String resetLink = "http://vofa-forest.site/reset-password?token=" + token; //운영
 		//String resetLink = "http://localhost:8080/reset-password?token=" + token; //개발
 		System.out.println("email " + email);
 		emailService.sendResetLink(email, resetLink);
@@ -121,12 +121,12 @@ public class UserController {
 	}
 
 	// 비밀번호 재설정
-	@PostMapping("/reset-password")
+	@PostMapping("/users/reset-password")
 	public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequestDto dto) {
 		String email = redisTemplate.opsForValue().get("reset:" + dto.getToken());
 
 		if (email == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않응 요청입니다.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 요청입니다.");
 		}
 
 		boolean success = userService.resetPassword(email, dto.getPassword());

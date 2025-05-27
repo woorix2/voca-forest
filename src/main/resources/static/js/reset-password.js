@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const password = passwordInput.value.trim();
     const checkPassword = checkPasswordInput.value.trim();
-    const token = tokenInput.value; // ✅ 여기서 token 가져오기
+    const token = tokenInput.value; // token 가져오기
 
     // 유효성 검사
     if (!password || !checkPassword) {
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     try {
-      const response = await fetch('/reset-password', {
+      const response = await fetch('/users/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password }) // token 포함

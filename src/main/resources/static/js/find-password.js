@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const birthDate = `${birthYear}-${birthMonth.padStart(2, '0')}-${birthDay.padStart(2, '0')}`;
 
     try {
-      const response = await fetch('/find-password', {
+      const response = await fetch('/users/password-reset-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name, birthDate: birthDate })

@@ -100,7 +100,7 @@ public class UserController {
 
 		redisTemplate.opsForValue().set("reset:" + token, email, Duration.ofMinutes(15));
 
-		String resetLink = "http://vofa-forest.site/reset-password?token=" + token; //운영
+		String resetLink = "https://vofa-forest.site/reset-password?token=" + token; //운영
 		//String resetLink = "http://localhost:8080/reset-password?token=" + token; //개발
 		System.out.println("email " + email);
 		emailService.sendResetLink(email, resetLink);

@@ -110,7 +110,7 @@ public class WordController {
 		if (gptWords == null) {
 			// Redis에 없으면 GPT 호출
 			gptWords = chatGPTService.findSynonyms(word);
-			redisTemplate.opsForValue().set("synonyms::" + word, gptWords, Duration.ofDays(365)); // 1일 TTL
+			redisTemplate.opsForValue().set("synonyms::" + word, gptWords, Duration.ofDays(365));
 		}
 
 		// 로그인 상태라면 최근 검색어 저장
